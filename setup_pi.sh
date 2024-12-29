@@ -5,9 +5,7 @@ mkdir ~/code
 cd ~/code
 sudo apt-get -y update
 sudo apt-get -y upgrade
-sudo apt-get install -y git
-sudo apt-get install -y python3-pip
-sudo apt-get install -y vim 
+sudo apt-get install -y git python3-pip vim i2c-tools
 git clone https://github.com/etragardh/hockey-target
 cd hockey-target
 python3 -m venv .venv
