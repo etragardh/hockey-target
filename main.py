@@ -35,7 +35,12 @@ def cfg(key = False, value = False):
     config[key] = value
 
 game  = SourceFileLoader("Source Module",f'games/{cfg("game")}.py').load_module().Game(debug = DEBUG)
-game.start()
+
+try:
+  game.start()
+except KeyboardInterrupt as e:
+  p.v('Exiting')
+  game.exit()
 
 with open('config.json', 'w+') as fp:
   fp.write(json.dumps(config))

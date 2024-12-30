@@ -1,24 +1,24 @@
 from lcd import LCD
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
 from cprint import CPrint
 from games.base import GameBase
 import time
 
 p = CPrint()
-lcd = LCD()
+lcd = LCD(debug=True)
 
-UPPER_GPIO = 23
-LOWER_GPIO = 24
+#UPPER_GPIO = 23
+#LOWER_GPIO = 24
+
 # Test
-def hit_callback(HIT_GPIO):
-  print('HIT: ' + HIT_GPIO)
+#def hit_callback(HIT_GPIO):
+#  print('HIT: ' + HIT_GPIO)
 
-GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BCM)
+#GPIO.setwarnings(False)
+#GPIO.setmode(GPIO.BCM)
 
-GPIO.setup(UPPER_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #initial value = DOWN/LOW/OFF
-GPIO.add_event_detect(UPPER_GPIO,GPIO.RISING,callback=hit_callback)
-
+#GPIO.setup(UPPER_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #initial value = DOWN/LOW/OFF
+#GPIO.add_event_detect(UPPER_GPIO,GPIO.RISING,callback=hit_callback)
 
 # Game: Single Player
 class Game(GameBase):
@@ -30,30 +30,33 @@ class Game(GameBase):
     super().__init__('Single Player', 'single', debug)
 
     if debug:
-      p.enable_debug()
-
-    self.init()
-
-  def init(self):
-    p.vv('Init GPIO')
-#    GPIO.setwarnings(False)
-#    GPIO.setmode(GPIO.BCM)
-
-#    GPIO.setup(UPPER_GPIO, GPIO.IN, pull_up_down=GPIO.PUD_DOWN) #initial value = DOWN/LOW/OFF
-#    GPIO.add_event_detect(UPPER_GPIO,GPIO.RISING,callback=self.hit_callback.__func__)
-
+      p.enable_debug(debug)
+  #
+  # Local override
   def hit_callback(self, area):
-    p.vvv('HIT CB: ' + area)
-    # make some conditions to be met for register hits
-    self.hit(area)
+    p.v('GAME: HIT: ', area)
+    self.score += 1
+    self.print_score()
 
-  def hit(area):
-    p.v('HIT: ' + area)
-    self.score
-
+  #
+  # Local override
   def reset(self):
     super().reset()
-    self.score = 0      # default score is array
+    self.score = 0        # default score is array
+    lcd.p1('Score: 0')
   
+  #
+  # Called once at game start
   def play(self):
-    p.v('this is a play loop')
+    p.v('GAME: this is a play loop')
+    lcd.p1('Playing')
+    self.print_score()
+
+  #
+  # Called every second
+  def tick(self, time_left, time_elapsed):
+    lcd.p1('Playing: ' + str(time_left))
+    p.vvv("Tick: ", time_left, time_elapsed)
+
+  def print_score(self):
+    lcd.p2('Score: ' + str(self.score))
